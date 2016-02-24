@@ -33,7 +33,7 @@ def search():
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( { "results": results["hits"]["hits"] } )
 
-@app.route('/within_radius', methods=['GET']):
+@app.route('/within_radius', methods=['GET'])
 def within_radius():
 	lat = request.args.get('lat')
 	lon = request.args.get('lon')

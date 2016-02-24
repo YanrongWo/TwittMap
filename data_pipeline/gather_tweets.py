@@ -23,7 +23,7 @@ es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
 # create geospatial mapping
 try:
 	es.indices.create(index='tweet', ignore=400)
-	mapping = {"properties": { "coordinates": {"properties": { "coordinates": { "type": "geo_point" }, "type": {"type": "string"}}}}}
+	mapping = {"tweet": { "properties": { "coordinates": {"properties": { "coordinates": { "type": "geo_point" }, "type": {"type": "string"}}}}}}
 	es.indices.put_mapping(index='tweet',doc_type='tweet',body=mapping)
 except Exception, e:
 	pass
@@ -44,6 +44,7 @@ print "Indexing tweets..."
 for tweet in cursor:
 	try: 
 		if tweet["coordinates"] != None:
+			"[i] Tweet indexed"
 			es.index(index='tweet', doc_type='tweet', body=tweet)
 		else:
 			pass # No coordinates
