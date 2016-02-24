@@ -20,6 +20,14 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
 	if os.environ["TWITTMAP_ES_NODES"] != None else None)
 
+# create geospatial mapping
+try:
+	es.indices.create(index='tweet', ignore=400)
+	mapping = {"properties": { "coordinates": {"properties": { "coordinates": { "type": "geo_point" }, "type": {"type": "string"}}}}}
+	es.indices.put_mapping(index='tweet',doc_type='tweet',body=mapping)
+except Exception, e:
+	pass
+ 
 consumer_key = os.environ["TWITTMAP_TWITTER_CONSUMER_KEY"]
 consumer_secret = os.environ["TWITTMAP_TWITTER_CONSUMER_SECRET"]
 
