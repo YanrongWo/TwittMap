@@ -33,6 +33,24 @@ def search():
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( { "results": results["hits"]["hits"] } )
 
+@app.route('/within_radius', methods=['GET']):
+def within_radius():
+	lat = request.args.get('lat')
+	lon = request.args.get('lon')
+
+	try:
+		lat, lon = float(lat), float(lon)
+	except ValueError, e:
+		return "{\"results\": []}"
+
+	if lat == None or lon == None:
+		return "{\"results\": []}"
+	else:
+		query_body = { "query": {"filtered": {"query": {"match_all": {}}}, "filter": {}}}
+		query_body["query"]["filtered"]["filter"] = {"geo_distance": { distance : "200km", "coordinates.coordinates": { "lat": lat, "lon": lon }}}
+		results = es.search(index='tweet', body=query_body)
+		return jsonify( {"results": results["hits"]["hits"]} )
+
 
 if __name__ == "__main__":
 	host, port = "0.0.0.0", 8000
