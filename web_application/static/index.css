@@ -18,4 +18,24 @@ body{
 #panel{
 	width: 30%;
 	float: left;
+	position: relative;
+	display: block;
+}
+
+#twittmap{
+	margin: 3vw;
+	font-size: 3vw;
+}
+
+#choosetag{
+	margin-left: 3vw;
+	font-size: 2vw;
+}
+
+#dropdownMenu1{
+	margin-left: 3vw;
+}
+
+.dropdown-menu{
+	margin-left: 3vw;
 }
