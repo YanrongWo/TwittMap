@@ -11,6 +11,7 @@ from __init__ import * # Ensure proper configuration is in place for querying tw
 
 from flask import Flask, request, render_template, g, redirect, Response, make_response
 import os
+import sys
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -19,31 +20,12 @@ app = Flask(__name__, template_folder=tmpl_dir)
 def index():
 	return render_template("index.html")
 
-
 if __name__ == "__main__":
-  import click
+	host, port = "0.0.0.0", 8000
+	if len(sys.argv) >= 3:
+		host = sys.argv[1]
+		port = sys.argv[2]
 
-  @click.command()
-  @click.option('--debug', is_flag=True)
-  @click.option('--threaded', is_flag=True)
-  @click.argument('HOST', default='0.0.0.0')
-  @click.argument('PORT', default=8111, type=int)
-  def run(debug, threaded, host, port):
-    """
-    This function handles command line parameters.
-    Run the server using
+	app.run(host=host, port=port, debug=True)
 
-        python server.py
-
-    Show the help text using
-
-        python server.py --help
-
-    """
-
-    HOST, PORT = host, port
-    print "running on %s:%d" % (HOST, PORT)
-    app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
-
-
-  run()
+	run()
