@@ -7,7 +7,7 @@
 # Dependencies: elasticsearch
 ####################################################################
 
-#from __init__ import * # Ensure proper configuration is in place for querying tweets
+from __init__ import * # Ensure proper configuration is in place for querying tweets
 
 from elasticsearch import Elasticsearch
 from flask import Flask, request, render_template, g, redirect, Response, make_response, jsonify
@@ -46,8 +46,11 @@ def within_radius():
 	if lat == None or lon == None:
 		return "{\"results\": []}"
 	else:
-		query_body = { "query": {"filtered": {"query": {"match_all": {}}}, "filter": {}}}
-		query_body["query"]["filtered"]["filter"] = {"geo_distance": { distance : "200km", "coordinates.coordinates": { "lat": lat, "lon": lon }}}
+		es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
+			if os.environ["TWITTMAP_ES_NODES"] != None else None)
+
+		query_body= {"query":{"filtered":{"query":{"match_all":{}},"filter" : {"geo_distance" : {"distance" : "10km","coordinates.coordinates" : {"lat" : lat,"lon" : lon}}}}}}
+		
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( {"results": results["hits"]["hits"]} )
 
