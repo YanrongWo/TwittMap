@@ -44,7 +44,7 @@ print "Indexing tweets..."
 for tweet in cursor:
 	try: 
 		if tweet["coordinates"] != None:
-			"[i] Tweet indexed"
+			print "[i] Tweet indexed"
 			es.index(index='tweet', doc_type='tweet', body=tweet)
 		else:
 			pass # No coordinates

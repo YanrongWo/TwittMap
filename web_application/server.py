@@ -25,7 +25,7 @@ def index():
 def search():
 	keyword = request.args.get('keyword')
 	if keyword == None:
-		return "{\"results\": []}"
+		return jsonify({"results": []})
 	else:
 		es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
 			if os.environ["TWITTMAP_ES_NODES"] != None else None)
@@ -41,16 +41,16 @@ def within_radius():
 	try:
 		lat, lon = float(lat), float(lon)
 	except ValueError, e:
-		return "{\"results\": []}"
+		return jsonify({"results": []})
 
 	if lat == None or lon == None:
-		return "{\"results\": []}"
+		return jsonify({"results": []})
 	else:
 		es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
 			if os.environ["TWITTMAP_ES_NODES"] != None else None)
 
 		query_body= {"query":{"filtered":{"query":{"match_all":{}},"filter" : {"geo_distance" : {"distance" : "10km","coordinates.coordinates" : {"lat" : lat,"lon" : lon}}}}}}
-		
+
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( {"results": results["hits"]["hits"]} )
 
