@@ -58,11 +58,19 @@
       $(function(){
 
         $(".dropdown-menu li a").click(function(){
-            console.log("here");
-          $("#dropdownMenu1").text($(this).text());
-          $("#dropdownMenu1").val($(this).text());
+          var value = $(this).text();
+          $("#dropdownMenu1").text(value);
+          $("#dropdownMenu1").val(value);
           $("#dropdownMenu1").append('<span class="caret"></span>');
-
+          $.ajax({
+            method: "GET",
+            url: "/search",
+            data: { keyword: value},
+            success: function(results){
+              console.log(results);
+              JSON.parse(results);
+            }
+          });
        });
 
     });
