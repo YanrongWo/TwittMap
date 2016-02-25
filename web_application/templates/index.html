@@ -26,10 +26,10 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li><a href="#"> Tag 1 </a></li>
-            <li><a href="#"> Tag 2 </a></li>
-            <li><a href="#"> Tag 3 </a></li>
-            <li><a href="#"> Tag 4 </a></li>
+            <li><a href="#"> a </a></li>
+            <li><a href="#"> b </a></li>
+            <li><a href="#"> c </a></li>
+            <li><a href="#"> d </a></li>
             <li><a href="#"> Tag 5 </a></li>
             <li><a href="#"> Tag 6 </a></li>
             <li><a href="#"> Tag 7 </a></li>
@@ -46,17 +46,28 @@
       var map;
       function initMap() {
         var width = $("#map").width();
-        console.log(width);
         var zoom = Math.floor(Math.log2(width) - 7);
-        console.log(zoom);
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 40.8075, lng: -73.9619},
           zoom: zoom
         });
+
+        google.maps.event.addListener(map, "click", function (event) {
+          console.log("here");
+          var latitude = event.latLng.lat();
+          var longitude = event.latLng.lng();
+          $.ajax({
+              method: "GET",
+              url: "/within_radius",
+              data: { lat: latitude, lon: longitude },
+              success: function(results){
+                show_results(results);
+            }
+          });
+        });
       }
 
       $(function(){
-
         $(".dropdown-menu li a").click(function(){
           var value = $(this).text();
           $("#dropdownMenu1").text(value);
@@ -67,13 +78,50 @@
             url: "/search",
             data: { keyword: value},
             success: function(results){
-              console.log(results);
-              JSON.parse(results);
+              show_results(results);
             }
           });
        });
-
     });
+
+    var markers = [];
+    function removeMarkers(){
+      var i;
+      for(i = 0; i < markers.length; i++){
+          markers[i].setMap(null);
+      }
+    }
+
+    function show_results(results){
+      console.log(results);
+      removeMarkers(null);
+      markers = [];
+      var i;
+      for (i = 0; i < results["results"].length; i++){
+        var lon = results["results"][i]["_source"]["coordinates"]["coordinates"][0];
+        var lat = results["results"][i]["_source"]["coordinates"]["coordinates"][1];
+        var latlng = {lat: lat, lng: lon};
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: map
+        });
+        markers.push(marker);
+        var text = results["results"][i]["_source"]["text"];
+        var user = results["results"][i]["_source"]["user"]["screen_name"];
+        var tweet_link = "https://twitter.com/statuses/" + results["results"][i]["_source"]["id_str"];
+        var user_link = "https://twitter.com/" + user;
+        var content_str = "<div><a href=" + tweet_link +"><p> " + text + "\n</p></a>" 
+                          + "<p> by: <a href=" + user_link +"> " + user +  "\n</a></p></div>";
+        var infowindow = new google.maps.InfoWindow({
+          content: content_str
+        });
+        (function(a,b,c) { 
+          b.addListener('click', function() {
+          c.open(a, b);
+        });})(map, marker, infowindow);
+      }
+    }
+
     </script>
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVNUbAwv-DUN23AlnPjJCXV8M35Jr-6xo&callback=initMap">
