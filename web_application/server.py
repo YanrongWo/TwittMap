@@ -17,10 +17,13 @@ import sys
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
+
+# Home Page
 @app.route('/', methods=["POST", "GET"])
 def index():
 	return render_template("index.html")
 
+# Get results to a tag search
 @app.route('/search', methods=['GET'])
 def search():
 	keyword = request.args.get('keyword')
@@ -33,6 +36,7 @@ def search():
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( { "results": results["hits"]["hits"] } )
 
+# Get results to a map radius search
 @app.route('/within_radius', methods=['GET'])
 def within_radius():
 	lat = request.args.get('lat')
@@ -49,12 +53,12 @@ def within_radius():
 		es = Elasticsearch(json.loads(os.environ["TWITTMAP_ES_NODES"]) \
 			if os.environ["TWITTMAP_ES_NODES"] != None else None)
 
-		query_body= {"query":{"filtered":{"query":{"match_all":{}},"filter" : {"geo_distance" : {"distance" : "10km","coordinates.coordinates" : {"lat" : lat,"lon" : lon}}}}}}
+		query_body= {"query":{"filtered":{"query":{"match_all":{}},"filter" : {"geo_distance" : {"distance" : "500km","coordinates.coordinates" : {"lat" : lat,"lon" : lon}}}}}}
 
 		results = es.search(index='tweet', body=query_body)
 		return jsonify( {"results": results["hits"]["hits"]} )
 
-
+# Main function
 if __name__ == "__main__":
 	host, port = "0.0.0.0", 8000
 	if len(sys.argv) >= 3:
