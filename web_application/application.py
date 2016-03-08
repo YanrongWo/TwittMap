@@ -1,8 +1,8 @@
 ####################################################################
-# web_application/server.py
+# web_applicationlication/server.py
 # COMS E6998, Assignment 1 - TwittMap
 # 
-# Performs routing for the TwittMap web application.
+# Performs routing for the TwittMap web applicationlication.
 #
 # Dependencies: elasticsearch
 ####################################################################
@@ -15,16 +15,16 @@ import os
 import sys
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-app = Flask(__name__, template_folder=tmpl_dir)
+application = Flask(__name__, template_folder=tmpl_dir)
 
 
 # Home Page
-@app.route('/', methods=["POST", "GET"])
+@application.route('/', methods=["POST", "GET"])
 def index():
 	return render_template("index.html")
 
 # Get results to a tag search
-@app.route('/search', methods=['GET'])
+@application.route('/search', methods=['GET'])
 def search():
 	keyword = request.args.get('keyword')
 	if keyword == None:
@@ -37,7 +37,7 @@ def search():
 		return jsonify( { "results": results["hits"]["hits"] } )
 
 # Get results to a map radius search
-@app.route('/within_radius', methods=['GET'])
+@application.route('/within_radius', methods=['GET'])
 def within_radius():
 	lat = request.args.get('lat')
 	lon = request.args.get('lon')
@@ -60,11 +60,11 @@ def within_radius():
 
 # Main function
 if __name__ == "__main__":
-	host, port = "0.0.0.0", 8000
+	host, port = "0.0.0.0", 5000
 	if len(sys.argv) >= 3:
 		host = sys.argv[1]
 		port = sys.argv[2]
 
-	app.run(host=host, port=port, debug=True)
+	application.run(host=host, port=port, debug=True)
 
 	run()
